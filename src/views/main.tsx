@@ -1,51 +1,90 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   Text,
-  FlatList,
-  View,
-  Image,
   StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Image,
 } from 'react-native';
+
 import useDataApi from '../services/useDataApi';
 
-const Main = () => {
+const Main = ({navigation}: any) => {
   const data = useDataApi();
-  console.log(data);
+  const [cardMagic, setCardMagic] = useState('');
 
-  const renderItem = ({item, index}: any) => (
-    <View style={styles.cards} key={index}>
-      <Image style={styles.imgCard} source={{uri: item.image_uris.normal}} />
-    </View>
-  );
+  const handleChange = (value: string) => {
+    data.filter((item) =>
+      value === item.name ? setCardMagic(item.image_uris.normal) : null,
+    );
+  };
+
+  const ShowSearch: Props = (props: string) => {
+    const isSuccess = props.isSuccess;
+    if (isSuccess !== '') {
+      return <Image style={styles.imgCard} source={{uri: cardMagic}} />;
+    }
+    return <Text style={styles.resultSearch}>Registro não encontrado</Text>;
+  };
 
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <Text>Teste</Text>
-
-        <FlatList
-          data={data}
-          keyExtractor={(item: any) => item.id}
-          numColumns={2}
-          renderItem={renderItem}
+        <TouchableOpacity
+          style={styles.buttonNavigation}
+          onPress={() => {
+            navigation.navigate('Cards');
+          }}>
+          <Text style={styles.textButtonNavigation}>deck of cards</Text>
+        </TouchableOpacity>
+        <TextInput
+          style={styles.searchCards}
+          placeholder={'Busque a carta. Ex.: Leveler'}
+          onChangeText={handleChange}
         />
+        <ShowSearch isSuccess={cardMagic} />
       </SafeAreaView>
     </>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    backgroundColor: '#ececec',
   },
-  cards: {
-    margin: 10,
+  buttonNavigation: {
+    backgroundColor: '#5e4f67',
+    padding: 20,
+    borderRadius: 8,
+    margin: 20,
+  },
+  textButtonNavigation: {
+    color: '#FFF',
+    fontSize: 18,
+    textTransform: 'uppercase',
+    fontWeight: '500',
+  },
+  searchCards: {
+    borderWidth: 2,
+    borderColor: '#5e4f67',
+    padding: 20,
+    borderRadius: 8,
+    backgroundColor: '#ecebe5',
+    fontSize: 18,
+    textTransform: 'uppercase',
+    width: 300,
+  },
+  resultSearch: {
+    margin: 20,
+    fontSize: 18,
   },
   imgCard: {
-    width: 180,
-    height: 260,
+    marginTop: 20,
+    width: 200,
+    height: 280,
   },
 });
 
